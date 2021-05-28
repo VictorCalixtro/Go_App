@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/victorcalixtro/Web_App/pkg/config"
+	"github.com/victorcalixtro/Web_App/pkg/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -19,8 +20,16 @@ func NewTemplates(a *config.AppConfig){
 	app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData{
+
+
+
+	return td
+}
+
+
 // RenderTemplate renders a template
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	//get the template cache from the app config
 	if app.UseCache {
@@ -35,7 +44,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	}
 
 	buf := new(bytes.Buffer)
-
+	td = AddDefaultData(td)
 	_ = t.Execute(buf,nil)
 	buf.WriteTo(w)
 
