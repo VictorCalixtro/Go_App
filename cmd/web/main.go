@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/alexedwards/scs/v2"
-	"github.com/victorcalixtro/Web_App/pkg/config"
-	"github.com/victorcalixtro/Web_App/pkg/handlers"
-	"github.com/victorcalixtro/Web_App/pkg/render"
+	"github.com/victorcalixtro/Web_App/internal/config"
+	"github.com/victorcalixtro/Web_App/internal/handlers"
+	"github.com/victorcalixtro/Web_App/internal/render"
 	"log"
 	"net/http"
 	"time"
