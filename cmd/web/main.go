@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
 	"github.com/victorcalixtro/Web_App/internal/config"
 	"github.com/victorcalixtro/Web_App/internal/handlers"
+	"github.com/victorcalixtro/Web_App/internal/models"
 	"github.com/victorcalixtro/Web_App/internal/render"
 	"log"
 	"net/http"
@@ -17,6 +19,7 @@ var session *scs.SessionManager
 
 func main() {
 
+	gob.Register(models.Reservation{})
 
 	app.InProduction = false
 
