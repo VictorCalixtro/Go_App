@@ -13,7 +13,7 @@ import (
 )
 
 var functions = template.FuncMap{}
-
+var pathToTemplates = "./templates"
 var app *config.AppConfig
 //sets the config for the template package
 
@@ -32,7 +32,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 
 
 // RenderTemplate renders a template
-func RenderTemplate(w http.ResponseWriter,r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter,r *http.Request, tmpl string, td *models.TemplateData) error {
 	var tc map[string]*template.Template
 	//get the template cache from the app config
 	if app.UseCache {
@@ -47,42 +47,43 @@ func RenderTemplate(w http.ResponseWriter,r *http.Request, tmpl string, td *mode
 	}
 
 	buf := new(bytes.Buffer)
-	td = AddDefaultData(td,r)
-	_ = t.Execute(buf,nil)
-	buf.WriteTo(w)
 
+	td = AddDefaultData(td, r)
 
-	_,err := buf.WriteTo(w)
+	_ = t.Execute(buf, td)
 
+	_, err := buf.WriteTo(w)
 	if err != nil {
-		fmt.Println("Error writing template to browser",err)
+		fmt.Println("error writing template to browser", err)
+		return err
 	}
+
+	return nil
 }
 
 func CreateTemplateCache() (map[string]*template.Template, error) {
 
 	myCache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./templates/*.page.tmpl")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.tmpl", pathToTemplates))
 	if err != nil {
 		return myCache, err
 	}
 
 	for _, page := range pages {
 		name := filepath.Base(page)
-		fmt.Println("Page is currently", page)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
 
-		matches, err := filepath.Glob("./templates/*.layout.tmpl")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(matches) > 0 {
-			ts, err = ts.ParseGlob("./templates/*.layout.tmpl")
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
