@@ -5,17 +5,20 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/victorcalixtro/Web_App/internal/config"
 	"github.com/victorcalixtro/Web_App/internal/handlers"
+	"github.com/victorcalixtro/Web_App/internal/helpers"
 	"github.com/victorcalixtro/Web_App/internal/models"
 	"github.com/victorcalixtro/Web_App/internal/render"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 const portnumber = ":8080"
 var app config.AppConfig
 var session *scs.SessionManager
-
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func main() {
 	err := run()
@@ -42,6 +45,11 @@ func run() error {
 	gob.Register(models.Reservation{})
 
 	app.InProduction = false
+	infoLog = log.New(os.Stdout, "INFO\t",log.Ldate | log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate | log.Ltime | log.Lshortfile)
+	app.ErrorLog = errorLog
 
 
 	session =scs.New()
@@ -62,9 +70,10 @@ func run() error {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
+	helpers.NewHelpers(&app)
+
+
 	log.Println("Serving on port", portnumber)
-
-
 
 	return nil
 }
